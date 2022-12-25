@@ -11,6 +11,12 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   const { data: session } = useSession();
 
+  // if (typeof window === "undefined") return null;
+
+  if (session) {
+    console.log(session);
+  }
+
   return (
     <>
       <Head>
@@ -21,7 +27,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         {!session && (
-          <Link href="/auth/signin-v2?redirectURL=https://3000">Login</Link>
+          <Link href="/auth/signin?redirectURL=https://3000">Login</Link>
         )}
 
         {session?.user && (
