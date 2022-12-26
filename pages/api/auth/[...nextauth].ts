@@ -8,8 +8,8 @@ import type { JWT } from "next-auth/jwt";
 export default NextAuth({
   providers: [
     GitHubProvider({
-      clientId: String(process.env.GITHUB_ID),
-      clientSecret: String(process.env.GITHUB_SECRET),
+      clientId: String(process.env.GITHUB_CLIENT_ID),
+      clientSecret: String(process.env.GITHUB_CLIENT_SECRET),
     }),
     GoogleProvider({
       clientId: "1234",

@@ -22,7 +22,7 @@ const Signin = ({ csrfToken, providers }) => {
             <button className={styles.primaryBtn}>Submit</button>
             <hr />
             {providers &&
-              Object.values(providers).map((provider) => (
+              Object.values(providers).map((provider: any) => (
                 <div key={provider.name} style={{ marginBottom: 0 }}>
                   <button onClick={() => signIn(provider.id)}>
                     Register or Sign in with {provider.name}

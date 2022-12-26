@@ -47,7 +47,7 @@ const Account = (props: any) => {
 
 export default Account;
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: any) {
   console.log(context);
 
   return {
