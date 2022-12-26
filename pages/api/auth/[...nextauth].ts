@@ -10,7 +10,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
   // Do whatever you want here, before the request is passed down to `NextAuth`
-  await loadSecrets();
+  // await loadSecrets();
 
   return NextAuth(req, res, {
     providers: [
