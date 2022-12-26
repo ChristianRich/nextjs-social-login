@@ -5,6 +5,7 @@ import styles from "../styles/Home.module.css";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Fragment } from "react";
+import { getEnvVars } from "../utils/env";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,8 @@ const inter = Inter({ subsets: ["latin"] });
 //   return location.host;
 // };
 
-export default function Home() {
+export default function Home(props) {
+  console.log(props);
   const { data: session } = useSession();
 
   if (session) {
@@ -153,4 +155,14 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps(context: any) {
+  const processVars = getEnvVars();
+
+  return {
+    props: {
+      processVars,
+    },
+  };
 }

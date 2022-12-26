@@ -4,12 +4,14 @@ import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import { Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import { getConfig } from "../../../utils/env";
+import { Config } from "../../../constants";
 
 export default NextAuth({
   providers: [
     GitHubProvider({
-      clientId: String(process.env.GITHUB_CLIENT_ID),
-      clientSecret: String(process.env.GITHUB_CLIENT_SECRET),
+      clientId: <string>getConfig(Config.GITHUB_CLIENT_ID),
+      clientSecret: <string>getConfig(Config.GITHUB_CLIENT_SECRET),
     }),
     GoogleProvider({
       clientId: "1234",

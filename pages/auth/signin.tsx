@@ -2,14 +2,18 @@ import { signIn, getCsrfToken, getProviders } from "next-auth/react";
 import Image, { ImageLoaderProps } from "next/image";
 import styles from "../../styles/Signin.module.css";
 import { useSession } from "next-auth/react";
+import { getEnvVars } from "../../utils/env";
 
-const Signin = ({ csrfToken, providers }) => {
+const Signin = ({ csrfToken, providers, processVars }) => {
   const { data: session } = useSession();
 
   if (session) {
-    console.log("Current session");
     console.log(session);
+  } else {
+    console.log("No session");
   }
+
+  console.log(processVars);
 
   return (
     <div style={{ overflow: "hidden", position: "relative" }}>
@@ -55,10 +59,13 @@ export default Signin;
 export async function getServerSideProps(context) {
   const providers = await getProviders();
   const csrfToken = await getCsrfToken(context);
+  const processVars = getEnvVars();
+
   return {
     props: {
       providers,
       csrfToken,
+      processVars,
     },
   };
 }

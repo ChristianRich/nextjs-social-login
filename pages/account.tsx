@@ -48,8 +48,7 @@ const Account = (props: any) => {
 export default Account;
 
 export async function getServerSideProps(context: any) {
-  console.log(context);
-
+  // Pull user profile using the Bearer token
   return {
     props: {},
   };
