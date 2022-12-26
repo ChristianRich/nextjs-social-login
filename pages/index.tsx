@@ -8,12 +8,19 @@ import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const getHost = (): string | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const location: Location = window.location;
+  return location.host;
+};
+
 export default function Home() {
   const { data: session } = useSession();
 
-  // if (typeof window === "undefined") return null;
-
   if (session) {
+    console.log("Current session");
     console.log(session);
   }
 
@@ -27,7 +34,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         {!session && (
-          <Link href="/auth/signin?redirectURL=https://3000">Login</Link>
+          <Link href={`/auth/signin?redirectURL=${getHost()}`}>Login</Link>
         )}
 
         {session?.user && (
