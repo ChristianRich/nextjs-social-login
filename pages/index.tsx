@@ -8,13 +8,13 @@ import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const getHost = (): string | null => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-  const location: Location = window.location;
-  return location.host;
-};
+// export const getHost = (): string | null => {
+//   if (typeof window === "undefined") {
+//     return null;
+//   }
+//   const location: Location = window.location;
+//   return location.host;
+// };
 
 export default function Home() {
   const { data: session } = useSession();
@@ -33,9 +33,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        {!session && (
-          <Link href={`/auth/signin?redirectURL=${getHost()}`}>Login</Link>
-        )}
+        {!session && <Link href="/auth/signin">Login</Link>}
 
         {session?.user && (
           <div className={inter.className}>

@@ -1,8 +1,16 @@
 import { signIn, getCsrfToken, getProviders } from "next-auth/react";
 import Image, { ImageLoaderProps } from "next/image";
 import styles from "../../styles/Signin.module.css";
+import { useSession } from "next-auth/react";
 
 const Signin = ({ csrfToken, providers }) => {
+  const { data: session } = useSession();
+
+  if (session) {
+    console.log("Current session");
+    console.log(session);
+  }
+
   return (
     <div style={{ overflow: "hidden", position: "relative" }}>
       <div className={styles.wrapper} />

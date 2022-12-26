@@ -20,8 +20,7 @@ export default NextAuth({
       clientSecret: "1234",
     }),
   ],
-  secret: String(process.env.JWT_SECRET),
-  debug: false,
+  debug: true,
   pages: {
     signIn: "/auth/signin",
     // signOut: '/auth/signout',
@@ -66,7 +65,7 @@ export default NextAuth({
     // This callback is called whenever a JSON Web Token is created (i.e. at sign in) or updated (i.e whenever a session is accessed in the client)
     // https://next-auth.js.org/configuration/callbacks#jwt-callback
     jwt: async ({ token, user, account, profile, isNewUser }): Promise<JWT> => {
-      // console.log("NextAuth.jwt");
+      console.log("NextAuth.jwt");
 
       // console.log(token);
       // {
@@ -100,7 +99,7 @@ export default NextAuth({
     // The session callback is called whenever a session is checked - fired after `jwt()`
     // https://next-auth.js.org/configuration/callbacks#session-callback
     session: async ({ session, token, user }): Promise<Session> => {
-      // console.log("NextAuth.session");
+      console.log("NextAuth.session");
 
       // console.log("session", session);
       // session {
@@ -129,20 +128,20 @@ export default NextAuth({
 
     // The redirect callback is called anytime the user is redirected to a callback URL (e.g. on signin or signout).
     //https://next-auth.js.org/configuration/callbacks#redirect-callback
-    async redirect({ url, baseUrl }) {
-      // console.log("NextAuth.redirect");
-      const { searchParams, origin } = new URL(url);
+    // async redirect({ url, baseUrl }) {
+    //   console.log("NextAuth.redirect");
+    //   const { searchParams, origin } = new URL(url);
 
-      if (searchParams.has("redirectURL")) {
-        return String(searchParams.get("redirectURL"));
-      }
+    //   if (searchParams.has("redirectURL")) {
+    //     // return String(searchParams.get("redirectURL"));
+    //   }
 
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (origin === baseUrl) return url;
-      return baseUrl;
-    },
+    //   // Allows relative callback URLs
+    //   if (url.startsWith("/")) return `${baseUrl}${url}`;
+    //   // Allows callback URLs on the same origin
+    //   else if (origin === baseUrl) return url;
+    //   return baseUrl;
+    // },
   },
   session: {
     strategy: "jwt",
