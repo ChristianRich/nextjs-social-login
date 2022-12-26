@@ -17,10 +17,12 @@ export enum SECRETS {
 // https://nextjs.org/docs/basic-features/environment-variables#environment-variable-load-order
 export enum NODE_ENV {
   TST = "test", // Rarely used
-  DEV = "development", // localhost
-  PRD = "production", // prod
+  DEV = "development", // = my localhost
+  PRD = "production", // When main branch is deployed with AWS Amplify
 }
 
+// Bug: Amplify doesn't have the AWS Credentials? It says "No credentials provider" when using SSM
+// I don't think the IAM assume role I created in Amplify console is attached, because IAM says the role has never been used?
 export const loadSecrets = async () => {
   const env = getConfig("NODE_ENV", false, NODE_ENV.DEV);
 
