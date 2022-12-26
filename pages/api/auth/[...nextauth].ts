@@ -51,6 +51,13 @@ export default NextAuth({
       clientId: "1234",
       clientSecret: "1234",
     }),
+    // Cognito({
+    //   clientId: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
+    //   clientSecret: process.env.NEXT_PUBLIC_AUTH_CLIENT_SECRET!,
+    //   issuer: process.env.NEXT_PUBLIC_AUTH_ISSUER!,
+    //   idToken: true,
+    //   checks: 'nonce',
+    // }),
   ],
   debug: true,
   pages: {

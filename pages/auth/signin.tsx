@@ -4,6 +4,16 @@ import styles from "../../styles/Signin.module.css";
 import { useSession } from "next-auth/react";
 import { getEnvVars } from "../../utils/env";
 
+export const doSignIn = (provider: string) => {
+  try {
+    console.log("Signin to " + provider);
+    signIn(provider);
+  } catch (e) {
+    console.log("SignIn Error");
+    console.log(e);
+  }
+};
+
 const Signin = ({ csrfToken, providers, processVars }) => {
   const { data: session } = useSession();
 
@@ -36,7 +46,7 @@ const Signin = ({ csrfToken, providers, processVars }) => {
             {providers &&
               Object.values(providers).map((provider: any) => (
                 <div key={provider.name} style={{ marginBottom: 0 }}>
-                  <button onClick={() => signIn(provider.id)}>
+                  <button onClick={() => doSignIn(provider.id)}>
                     Register or Sign in with {provider.name}
                   </button>
                 </div>
