@@ -1,41 +1,15 @@
 import NextAuth from "next-auth/next";
 import GitHubProvider from "next-auth/providers/github";
-import type { NextAuthOptions, Session } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import AppleProvider from "next-auth/providers/apple";
+import type { Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { getConfig } from "../../../utils/env";
-import { Config, loadSecrets } from "../../../constants";
-
-// export default async function auth(req: NextApiRequest, res: NextApiResponse) {
-//   // Do whatever you want here, before the request is passed down to `NextAuth`
-//   // await loadSecrets();
-
-//   return NextAuth(req, res, {
-//     providers: [
-//       GitHubProvider({
-//         clientId: <string>getConfig(Config.GITHUB_CLIENT_ID),
-//         clientSecret: <string>getConfig(Config.GITHUB_CLIENT_SECRET),
-//       }),
-//       GoogleProvider({
-//         clientId: "1234",
-//         clientSecret: "1234",
-//       }),
-//       AppleProvider({
-//         clientId: "1234",
-//         clientSecret: "1234",
-//       }),
-//     ],
-//     pages: {
-//       signIn: "/auth/signin",
-//     },
-//     session: {
-//       strategy: "jwt",
-//     },
-//     secret: <string>getConfig(Config.NEXTAUTH_SECRET),
-//   });
-// }
+import { Config } from "../../../constants";
+import { AdapterUser } from "next-auth/adapters";
 
 // https://next-auth.js.org/configuration/options
-export default NextAuth(<NextAuthOptions>{
+export default NextAuth({
   session: {
     strategy: "jwt",
   },
@@ -44,23 +18,16 @@ export default NextAuth(<NextAuthOptions>{
       clientId: <string>getConfig(Config.GITHUB_CLIENT_ID),
       clientSecret: <string>getConfig(Config.GITHUB_CLIENT_SECRET),
     }),
-    // GoogleProvider({
-    //   clientId: <string>getConfig(Config.GOOGLE_CLIENT_ID),
-    //   clientSecret: <string>getConfig(Config.GOOGLE_CLIENT_SECRET)
-    // }),
-    // AppleProvider({
-    //   clientId: <string>getConfig(Config.APPLE_CLIENT_ID),
-    //   clientSecret: <string>getConfig(Config.APPLE_CLIENT_SECRET)
-    // }),
-    // Cognito({
-    //   clientId: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
-    //   clientSecret: process.env.NEXT_PUBLIC_AUTH_CLIENT_SECRET!,
-    //   issuer: process.env.NEXT_PUBLIC_AUTH_ISSUER!,
-    //   idToken: true,
-    //   checks: 'nonce',
-    // }),
+    GoogleProvider({
+      clientId: <string>getConfig(Config.GOOGLE_CLIENT_ID),
+      clientSecret: <string>getConfig(Config.GOOGLE_CLIENT_SECRET),
+    }),
+    AppleProvider({
+      clientId: <string>getConfig(Config.APPLE_CLIENT_ID),
+      clientSecret: <string>getConfig(Config.APPLE_CLIENT_SECRET),
+    }),
   ],
-  debug: true,
+  debug: getConfig(Config.NEXTAUTH_DEBUG, false) === "1" || false,
   secret: <string>getConfig(Config.NEXTAUTH_SECRET),
   pages: {
     signIn: "/auth/signin",
@@ -69,10 +36,9 @@ export default NextAuth(<NextAuthOptions>{
     // verifyRequest: '/auth/verify-request', // (used for check email message)
     // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
   },
-  // TODO Fetch or create user profile data from User API on sign-in and sign-ups.
   // https://next-auth.js.org/configuration/callbacks
   callbacks: {
-    // Use the signIn() callback to control if a user is allowed to sign in.
+    // Use the signIn() callback to control if a user is allowed to sign in
     // https://next-auth.js.org/configuration/callbacks#sign-in-callback
     signIn: async ({ user, account, profile, email, credentials }) => {
       console.log(
@@ -83,7 +49,7 @@ export default NextAuth(<NextAuthOptions>{
         email,
         credentials
       );
-      // console.log("user", user);
+
       // user {
       //   id: '2510863',
       //   name: 'Christian Rich',
@@ -112,65 +78,29 @@ export default NextAuth(<NextAuthOptions>{
     },
     // This callback is called whenever a JSON Web Token is created (i.e. at sign in) or updated (i.e whenever a session is accessed in the client)
     // https://next-auth.js.org/configuration/callbacks#jwt-callback
-    jwt: async ({ token, user, account, profile, isNewUser }): Promise<JWT> => {
-      console.log("NextAuth.jwt");
-
-      // console.log(token);
-      // {
-      //   name: 'Christian Rich',
-      //   email: 'christian.schlosrich@gmail.com',
-      //   picture: 'https://avatars.githubusercontent.com/u/2510863?v=4',
-      //   sub: '2510863'
-      // }
-
-      // console.log(user);
-      // {
-      //   id: '2510863',
-      //   name: 'Christian Rich',
-      //   email: 'christian.schlosrich@gmail.com',
-      //   image: 'https://avatars.githubusercontent.com/u/2510863?v=4'
-      // }
-
-      // console.log("account", account);
-      // {
-      //   provider: 'github',
-      //   type: 'oauth',
-      //   providerAccountId: '2510863'
-      //   access_token: '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',
-      //   token_type: 'bearer',
-      //   scope: 'read:user,user:email'
-      // }
-
+    jwt: async ({
+      token,
+      user,
+    }: {
+      token: JWT;
+      user?: User | AdapterUser;
+    }): Promise<JWT> => {
+      console.log("NextAuth.jwt callback");
       return token;
     },
 
     // The session callback is called whenever a session is checked - fired after `jwt()`
     // https://next-auth.js.org/configuration/callbacks#session-callback
-    session: async ({ session, token, user }): Promise<Session> => {
-      console.log("NextAuth.session");
-
-      // console.log("session", session);
-      // session {
-      //   user: {
-      //     name: 'Christian Rich',
-      //     email: 'christian.schlosrich@gmail.com',
-      //     image: 'https://avatars.githubusercontent.com/u/2510863?v=4'
-      //   },
-      //   expires: '2023-01-24T11:50:42.270Z'
-      // }
-
-      // console.log("token", token);
-      // token {
-      //   name: 'Christian Rich',
-      //   email: 'christian.schlosrich@gmail.com',
-      //   picture: 'https://avatars.githubusercontent.com/u/2510863?v=4',
-      //   sub: '2510863',
-      //   iat: 1671969041,
-      //   exp: 1674561041,
-      //   jti: 'd23e5379-439a-4855-99f3-58631dd69cbd'
-      // }
-
-      // console.log("user", user);
+    session: async ({
+      session,
+      user,
+      token,
+    }: {
+      session: Session;
+      user: User | AdapterUser;
+      token: JWT;
+    }): Promise<Session> => {
+      console.log("NextAuth.session callback");
       return session;
     },
 

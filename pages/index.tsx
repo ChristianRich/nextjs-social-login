@@ -5,26 +5,13 @@ import styles from "../styles/Home.module.css";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Fragment } from "react";
-import { getEnvVars } from "../utils/env";
-// import { loadSecret } from "./api/services/aws-sm";
-// import { Config, SECRETS } from "../constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// export const getHost = (): string | null => {
-//   if (typeof window === "undefined") {
-//     return null;
-//   }
-//   const location: Location = window.location;
-//   return location.host;
-// };
-
 export default function Home(props) {
-  console.log(props);
   const { data: session } = useSession();
 
   if (session) {
-    console.log("Current session");
     console.log(session);
   }
 
@@ -160,11 +147,7 @@ export default function Home(props) {
 }
 
 export async function getServerSideProps(context: any) {
-  const processVars = getEnvVars();
-
   return {
-    props: {
-      processVars,
-    },
+    props: {},
   };
 }
