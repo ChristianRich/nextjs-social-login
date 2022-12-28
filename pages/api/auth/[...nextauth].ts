@@ -1,6 +1,6 @@
 import NextAuth from "next-auth/next";
 import GitHubProvider from "next-auth/providers/github";
-import { Session } from "next-auth";
+import type { NextAuthOptions, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { getConfig } from "../../../utils/env";
 import { Config, loadSecrets } from "../../../constants";
@@ -35,7 +35,7 @@ import { Config, loadSecrets } from "../../../constants";
 // }
 
 // https://next-auth.js.org/configuration/options
-export default NextAuth({
+export default NextAuth(<NextAuthOptions>{
   session: {
     strategy: "jwt",
   },
@@ -176,19 +176,19 @@ export default NextAuth({
 
     // The redirect callback is called anytime the user is redirected to a callback URL (e.g. on signin or signout).
     //https://next-auth.js.org/configuration/callbacks#redirect-callback
-    // async redirect({ url, baseUrl }) {
-    //   console.log("NextAuth.redirect");
-    //   const { searchParams, origin } = new URL(url);
+    async redirect({ url, baseUrl }) {
+      console.log("NextAuth.redirect");
+      const { searchParams, origin } = new URL(url);
 
-    //   if (searchParams.has("redirectURL")) {
-    //     // return String(searchParams.get("redirectURL"));
-    //   }
+      // if (searchParams.has("redirectURL")) {
+      // return String(searchParams.get("redirectURL"));
+      // }
 
-    //   // Allows relative callback URLs
-    //   if (url.startsWith("/")) return `${baseUrl}${url}`;
-    //   // Allows callback URLs on the same origin
-    //   else if (origin === baseUrl) return url;
-    //   return baseUrl;
-    // },
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows callback URLs on the same origin
+      else if (origin === baseUrl) return url;
+      return baseUrl;
+    },
   },
 });
