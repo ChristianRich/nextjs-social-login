@@ -2,13 +2,13 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
+import stylesSignIn from "../styles/Signin.module.css";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home(props) {
+export default function Home() {
   const { data: session } = useSession();
 
   if (session) {
@@ -24,26 +24,19 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        {!session && <Link href="/auth/signin">Login</Link>}
-
-        {session?.user && (
-          <div className={inter.className}>
-            <h2>User data</h2>
-            {Object.entries(session.user).map((tuple, idx) => (
-              <Fragment key={idx}>
-                <p>
-                  {tuple[0]}: {tuple[1]}
-                </p>
-              </Fragment>
-            ))}
-          </div>
-        )}
-
         <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.tsx</code>
-          </p>
+          {!session && (
+            <div className={styles.grid}>
+              <Link href="/auth/signin">
+                <div
+                  style={{ border: "1px solid", padding: "16px" }}
+                  className={stylesSignIn.primaryBtn}
+                >
+                  Login / Register
+                </div>
+              </Link>
+            </div>
+          )}
           <div>
             <a
               href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"

@@ -1,5 +1,4 @@
 import { signIn, getCsrfToken, getProviders } from "next-auth/react";
-import Image, { ImageLoaderProps } from "next/image";
 import styles from "../../styles/Signin.module.css";
 import { useSession } from "next-auth/react";
 import {
@@ -45,44 +44,17 @@ const Signin = ({ csrfToken, providers }) => {
       <div className={styles.wrapper} />
       <div className={styles.content}>
         <div className={styles.cardWrapper}>
-          {/* <Image
-            loader={({ src }: ImageLoaderProps) => src}
-            src="/logo-generic.svg"
-            width={196}
-            height={64}
-            alt="App Logo"
-            style={{ height: "85px", marginBottom: "20px" }}
-          /> */}
-
+          <h1 className={inter.className}>Login or register</h1>
           <div className={styles.cardContent}>
             <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-
-            <p
-              style={{
-                color: "#000",
-                fontSize: "16px",
-                padding: "8px",
-                height: "50px",
-                fontWeight: "normal",
-              }}
-              className={inter.className}
-            >
-              Register or log in with your email
-            </p>
             <input style={{ height: "50px" }} placeholder="Email" />
-            <button className={styles.primaryBtn}>Submit</button>
-            <hr />
-            <p
-              style={{
-                color: "#000",
-                fontSize: "16px",
-                padding: "8px",
-                fontWeight: "normal",
-              }}
-              className={inter.className}
+            <button
+              onClick={() => alert("Feature not implemented")}
+              className={styles.primaryBtn}
             >
-              Or log in with a social identity provider
-            </p>
+              Submit
+            </button>
+            <hr />
             {providers &&
               Object.values(providers).map((provider: any) => (
                 <div key={provider.name} style={{ marginBottom: "16px" }}>

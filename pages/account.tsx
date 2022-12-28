@@ -47,6 +47,7 @@ const Account = (props: any) => {
 
 export default Account;
 
+// TODO Protect route
 export async function getServerSideProps(context: any) {
   // Pull user profile using the Bearer token
   return {
