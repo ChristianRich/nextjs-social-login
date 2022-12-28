@@ -1,12 +1,9 @@
 import NextAuth from "next-auth/next";
 import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
-import AppleProvider from "next-auth/providers/apple";
-import { AuthOptions, Session } from "next-auth";
+import { Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { getConfig } from "../../../utils/env";
 import { Config, loadSecrets } from "../../../constants";
-// import { NextApiRequest, NextApiResponse } from "next";
 
 // export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 //   // Do whatever you want here, before the request is passed down to `NextAuth`
@@ -37,20 +34,24 @@ import { Config, loadSecrets } from "../../../constants";
 //   });
 // }
 
+// https://next-auth.js.org/configuration/options
 export default NextAuth({
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     GitHubProvider({
       clientId: <string>getConfig(Config.GITHUB_CLIENT_ID),
       clientSecret: <string>getConfig(Config.GITHUB_CLIENT_SECRET),
     }),
-    GoogleProvider({
-      clientId: "1234",
-      clientSecret: "1234",
-    }),
-    AppleProvider({
-      clientId: "1234",
-      clientSecret: "1234",
-    }),
+    // GoogleProvider({
+    //   clientId: <string>getConfig(Config.GOOGLE_CLIENT_ID),
+    //   clientSecret: <string>getConfig(Config.GOOGLE_CLIENT_SECRET)
+    // }),
+    // AppleProvider({
+    //   clientId: <string>getConfig(Config.APPLE_CLIENT_ID),
+    //   clientSecret: <string>getConfig(Config.APPLE_CLIENT_SECRET)
+    // }),
     // Cognito({
     //   clientId: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID!,
     //   clientSecret: process.env.NEXT_PUBLIC_AUTH_CLIENT_SECRET!,
@@ -60,6 +61,7 @@ export default NextAuth({
     // }),
   ],
   debug: true,
+  secret: <string>getConfig(Config.NEXTAUTH_SECRET),
   pages: {
     signIn: "/auth/signin",
     // signOut: '/auth/signout',
@@ -73,7 +75,14 @@ export default NextAuth({
     // Use the signIn() callback to control if a user is allowed to sign in.
     // https://next-auth.js.org/configuration/callbacks#sign-in-callback
     signIn: async ({ user, account, profile, email, credentials }) => {
-      console.log("NextAuth.signIn");
+      console.log(
+        "NextAuth.signIn",
+        user,
+        account,
+        profile,
+        email,
+        credentials
+      );
       // console.log("user", user);
       // user {
       //   id: '2510863',
@@ -181,8 +190,5 @@ export default NextAuth({
     //   else if (origin === baseUrl) return url;
     //   return baseUrl;
     // },
-  },
-  session: {
-    strategy: "jwt",
   },
 });

@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Fragment } from "react";
 import { getEnvVars } from "../utils/env";
-import { loadSecret } from "./api/services/aws-sm";
-import { Config, SECRETS } from "../constants";
+// import { loadSecret } from "./api/services/aws-sm";
+// import { Config, SECRETS } from "../constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
