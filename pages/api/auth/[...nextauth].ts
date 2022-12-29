@@ -1,9 +1,10 @@
+import type { Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
-import type { Session, User } from "next-auth";
-import type { JWT } from "next-auth/jwt";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { getConfig } from "../../../utils/env";
 import { Config } from "../../../constants";
 import { AdapterUser } from "next-auth/adapters";
@@ -14,6 +15,39 @@ export default NextAuth({
     strategy: "jwt",
   },
   providers: [
+    CredentialsProvider({
+      // The name to display on the sign in form (e.g. 'Sign in with...')
+      name: "Credentials",
+      // The credentials is used to generate a suitable form on the sign in page.
+      // You can specify whatever fields you are expecting to be submitted.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        // You need to provide your own logic here that takes the credentials
+        // submitted and returns either a object representing a user or value
+        // that is false/null if the credentials are invalid.
+        // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+        // You can also use the `req` object to obtain additional parameters
+        // (i.e., the request IP address)
+        const res = await fetch("/your/endpoint", {
+          method: "POST",
+          body: JSON.stringify(credentials),
+          headers: { "Content-Type": "application/json" },
+        });
+        const user = await res.json();
+
+        // If no error and we have user data, return it
+        if (res.ok && user) {
+          return user;
+        }
+        // Return null if user data could not be retrieved
+        return null;
+      },
+    }),
     GitHubProvider({
       clientId: <string>getConfig(Config.GITHUB_CLIENT_ID),
       clientSecret: <string>getConfig(Config.GITHUB_CLIENT_SECRET),
@@ -36,7 +70,35 @@ export default NextAuth({
     // verifyRequest: '/auth/verify-request', // (used for check email message)
     // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
   },
+  // Events are asynchronous functions that do not return a response, they are useful for audit logging.
+  events: {
+    async signIn(message) {
+      /* on successful sign in */
+      console.log("Nextauth.event.session", message);
+    },
+    async signOut(message) {
+      console.log("Nextauth.event.signOut", message);
+      /* on signout */
+    },
+    async createUser(message) {
+      console.log("Nextauth.event.createUser", message);
+      /* user created */
+    },
+    async updateUser(message) {
+      console.log("Nextauth.event.updateUser", message);
+      /* user updated - e.g. their email was verified */
+    },
+    async linkAccount(message) {
+      console.log("Nextauth.event.linkAccount", message);
+      /* account (e.g. Twitter) linked to a user */
+    },
+    async session(message) {
+      console.log("Nextauth.event.session", message);
+      /* session is active */
+    },
+  },
   // https://next-auth.js.org/configuration/callbacks
+  // Callbacks are asynchronous functions you can use to control what happens when an action is performed.
   callbacks: {
     // Use the signIn() callback to control if a user is allowed to sign in
     // https://next-auth.js.org/configuration/callbacks#sign-in-callback
