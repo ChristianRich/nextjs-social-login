@@ -19,7 +19,7 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
   const [password, setPassword] = useState<string>();
   const [repeatPassword, setRepeatPassword] = useState<string>();
 
-  const resolveUserHandle = () =>
+  const resolveUserHandle = (): string | undefined =>
     username && username.length > 3 ? `@${toPascalCase(username)}` : email;
 
   const validate = (): boolean => {
@@ -58,8 +58,7 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
           margin: "16px",
         }}
       >
-        Welcome <strong>{resolveUserHandle()}</strong>. Let&apos;s get you
-        setup.
+        Welcome <strong>{resolveUserHandle()}</strong>. Let&apos;s get you setup
       </p>
       <input
         id="username"
