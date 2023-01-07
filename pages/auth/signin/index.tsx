@@ -6,7 +6,7 @@ import {
   AppleLoginButton,
 } from "react-social-login-buttons";
 import { Inter } from "@next/font/google";
-import Credentials from "./credentials";
+import Credentials from "../../../components/signin/credentials";
 
 const inter = Inter({ subsets: ["latin"] });
 

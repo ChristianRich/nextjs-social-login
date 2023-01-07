@@ -5,15 +5,25 @@ import styles from "../styles/Home.module.css";
 import stylesSignIn from "../styles/Signin.module.css";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  GetServerSidePropsResult,
+} from "next";
+import { DefaultPageProps } from "./_app";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-  const { data: session } = useSession();
+export interface Props extends DefaultPageProps {}
 
-  if (session) {
-    console.log(session);
-  }
+export default function Home(props: Props) {
+  const {
+    locals: {
+      location: { origin },
+    },
+  } = props;
+
+  const { data: session } = useSession();
 
   return (
     <>
@@ -27,7 +37,12 @@ export default function Home() {
         <div className={styles.description}>
           {!session && (
             <div className={styles.grid}>
-              <Link href="/auth/signin">
+              <Link
+                href={{
+                  pathname: `${origin}/auth/signin`,
+                  query: { redirectURL: `${origin}/account` },
+                }}
+              >
                 <div
                   style={{ border: "1px solid", padding: "16px" }}
                   className={stylesSignIn.primaryBtn}
@@ -139,8 +154,13 @@ export default function Home() {
   );
 }
 
-export async function getServerSideProps(context: any) {
+// https://nextjs.org/docs/basic-features/data-fetching/get-server-side-props
+export const getServerSideProps: GetServerSideProps<any> = async ({
+  req: _req,
+}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<any>> => {
   return {
-    props: {},
+    props: {
+      featuredProducts: [{ id: "1" }, { id: 2 }],
+    },
   };
-}
+};

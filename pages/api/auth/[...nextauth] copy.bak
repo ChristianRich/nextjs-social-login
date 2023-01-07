@@ -1,0 +1,320 @@
+import type { Account, Profile, Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import NextAuth from "next-auth/next";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import AppleProvider from "next-auth/providers/apple";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { getConfig } from "../../../utils/env";
+import { Config } from "../../../constants";
+import { AdapterUser } from "next-auth/adapters";
+import {
+  createSocialUser,
+  getUserByEmail,
+  signInUser,
+  verifyUsername,
+} from "../services/user-api";
+import slugify from "slugify";
+import { generateUsername } from "username-generator";
+import { HttpError } from "http-errors";
+
+// https://next-auth.js.org/configuration/options
+export default NextAuth({
+  session: {
+    strategy: "jwt",
+  },
+  providers: [
+    CredentialsProvider({
+      // The name to display on the sign in form (e.g. 'Sign in with...')
+      // name: "Credentials",
+      // The credentials is used to generate a suitable form on the sign in page.
+      // You can specify whatever fields you are expecting to be submitted.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        email: { type: "text", placeholder: "Email" },
+        password: { label: "Password", type: "password" },
+      },
+
+      // Triggered when a NextAuth Credentials flow is started via the F.E call `await signIn("credetials", { options });`
+      // This callback is NOT triggered on social provider login, only the credentials flow.
+      // This function exposes the credentials as entered by the user (email+password)
+      // Since NextAuth is not managing my users, but only the auth flow, I need to login the user via an Axios call to the User API, obtain tokens
+      // and return the user profile.
+      //
+      // { user: User; account: Account; id?: undefined; email?: undefined; token?: undefined; }
+      // This hook is called everytime a user logs in with credentials via NextAuth
+      async authorize(
+        credentials: Record<"email" | "password", string> | undefined,
+        req
+      ): Promise<User | null> {
+        // You need to provide your own logic here that takes the credentials
+        // submitted and returns either a object representing a user or value
+        // that is false/null if the credentials are invalid.
+        // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+        // You can also use the `req` object to obtain additional parameters
+        // (i.e., the request IP address)
+
+        // throw new Error("Knepper");
+
+        if (!credentials) {
+          console.error("Missing credentails in authorization callback");
+          return null;
+        }
+
+        const { email, password } = credentials;
+
+        const userProfileData: any | null = await getUserByEmail(email);
+
+        // if (userProfileData.accountType === "SOCIAL_PROVIDER") {
+        //   throw new Error("SOCIAL_PROVIDER cannot login");
+        // }
+
+        // if user exists in DB with that email, and user.accountType === 'SOCIAL_PROVIDER'
+        // then return null
+
+        const tokens: any | null = await signInUser(email, password);
+
+        if (!tokens) {
+          console.error("No tokens returned from sign-in");
+          return null;
+        }
+
+        // const userProfileData: any | null = await getUserByEmail(email);
+
+        if (!userProfileData) {
+          console.error("Back-end user not found");
+          return null;
+        }
+
+        // TODO User profile for both flows must be identical ..
+        return {
+          id: userProfileData.id,
+          name: userProfileData.name,
+          email: userProfileData.email,
+          image:
+            "https://png.pngtree.com/png-clipart/20210129/ourmid/pngtree-graphic-default-avatar-png-image_2813121.jpg", // TODO Remove
+        };
+
+        // export interface DefaultUser {
+        //   id: string;
+        //   name?: string | null;
+        //   email?: string | null;
+        //   image?: string | null;
+        // }
+      },
+    }),
+    GitHubProvider({
+      clientId: <string>getConfig(Config.GITHUB_CLIENT_ID),
+      clientSecret: <string>getConfig(Config.GITHUB_CLIENT_SECRET),
+    }),
+    GoogleProvider({
+      clientId: <string>getConfig(Config.GOOGLE_CLIENT_ID),
+      clientSecret: <string>getConfig(Config.GOOGLE_CLIENT_SECRET),
+    }),
+    AppleProvider({
+      clientId: <string>getConfig(Config.APPLE_CLIENT_ID),
+      clientSecret: <string>getConfig(Config.APPLE_CLIENT_SECRET),
+    }),
+  ],
+  debug: getConfig(Config.NEXTAUTH_DEBUG, false) === "1" || false,
+  secret: <string>getConfig(Config.NEXTAUTH_SECRET),
+  pages: {
+    // signIn: "/auth/signin",
+    // signOut: '/auth/signout',
+    // error: '/auth/error', // Error code passed in query string as ?error=
+    // verifyRequest: '/auth/verify-request', // (used for check email message)
+    // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
+  },
+  // Events are asynchronous functions that do not return a response, they are useful for audit logging.
+  events: {
+    // On successful sign in
+    async signIn(message: {
+      user: User;
+      account: Account | null;
+      profile?: Profile;
+      isNewUser?: boolean;
+    }) {
+      // console.log("Nextauth.event.signIn()", message);
+    },
+    async signOut(message: { session: Session; token: JWT }) {
+      // console.log("Nextauth.event.signOut()", message);
+    },
+    async createUser(message: { user: User }) {
+      // console.log("Nextauth.event.createUser()", message);
+    },
+    // User updated - e.g. their email was verified
+    // TODO I think this will only work if you use NextAuth with a database and let NextAuth manage the users and sessions
+    async updateUser(message) {
+      // console.log("Nextauth.event.updateUser()", message);
+    },
+    // Account (e.g. Twitter) linked to a user
+    async linkAccount(message) {
+      // console.log("Nextauth.event.linkAccount()", message);
+    },
+    // Session is active
+    async session(message) {
+      // console.log("Nextauth.event.session()", message);
+    },
+  },
+  // https://next-auth.js.org/configuration/callbacks
+  // Callbacks are asynchronous functions you can use to control what happens when an action is performed.
+  callbacks: {
+    // Use the signIn() callback to control if a user is allowed to sign in
+    // https://next-auth.js.org/configuration/callbacks#sign-in-callback
+    signIn: async (params: {
+      user: User | AdapterUser;
+      account: Account | null;
+    }): Promise<boolean | string> => {
+      const { user, account } = params;
+
+      if (!user || !account) {
+        return `/unauthorized?error=${encodeURIComponent(
+          `Authorization params not satisfied`
+        )}`;
+      }
+      // Social login: Retrieve or create new user. Returns EITHER a boolean value, true for allow login, false for deny, or a relative url
+      // with a message in the query-string e.g "/unauthorized?error=foo"
+      if (account.type === "oauth") {
+        return signInOrRegisterSocialUser({ user, account });
+      }
+
+      // Credentials flow: Users credentials already verified in `CredentialsProvider.authorize(params)` callback by obtaining tokens
+      // so it's safe to allow the login to proceed
+      if (account.type === "credentials") {
+        return true;
+      }
+
+      console.error(`Unsuported account provider type ${account.type}`);
+      return false;
+    },
+    // This callback is called whenever a JSON Web Token is created (i.e. at sign in) or updated (i.e whenever a session is accessed in the client)
+    // https://next-auth.js.org/configuration/callbacks#jwt-callback
+    jwt: async ({
+      token,
+      user,
+    }: {
+      token: JWT;
+      user?: User | AdapterUser;
+    }): Promise<JWT> => {
+      console.log("NextAuth.jwt callback");
+      return token;
+    },
+
+    // The session callback is called whenever a session is checked - fired after `jwt()`
+    // https://next-auth.js.org/configuration/callbacks#session-callback
+    session: async ({
+      session,
+      user,
+      token,
+    }: {
+      session: Session;
+      user: User | AdapterUser;
+      token: JWT;
+    }): Promise<Session> => {
+      console.log("NextAuth.session callback");
+      return session;
+    },
+
+    // The redirect callback is called anytime the user is redirected to a callback URL (e.g. on signin or signout).
+    // https://next-auth.js.org/configuration/callbacks#redirect-callback
+    async redirect({ url, baseUrl }) {
+      const { searchParams, origin } = new URL(url);
+      const redirectURL: string | null = searchParams.get("redirectURL");
+
+      if (redirectURL) {
+        return redirectURL;
+      }
+
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows callback URLs on the same origin
+      else if (origin === baseUrl) return url;
+      return baseUrl;
+    },
+  },
+});
+
+// Fetch existing or create new social user
+export const signInOrRegisterSocialUser = async (params: {
+  user: User | AdapterUser;
+  account: Account;
+}): Promise<boolean | string> => {
+  const { account, user } = params;
+  const { email } = user;
+
+  if (!email) {
+    return `/unauthorized?error=${encodeURIComponent(
+      "User email expected from social provider auth response"
+    )}`;
+  }
+
+  const { provider, providerAccountId, type: providerType } = account;
+
+  try {
+    const existingUser: unknown | null = await getUserByEmail(email);
+
+    // Account found, no need to create a linked social user
+    if (existingUser) {
+      return true;
+    }
+  } catch (e) {
+    return `/unauthorized?error=${encodeURIComponent(
+      "An error occurred while setting up your account"
+    )}`;
+  }
+
+  // Use their social account profile info to create a username
+  let username = createUsername(user);
+
+  // When a username collision occurs, fallback to a unique random username e.g "appearance.spiky.440"
+  try {
+    await verifyUsername(username);
+  } catch (error) {
+    username = createGibberishUsername();
+  }
+
+  try {
+    await createSocialUser(
+      provider,
+      providerType,
+      providerAccountId,
+      username,
+      email
+    );
+
+    return true;
+  } catch (e) {
+    const { message, name } = <HttpError>e;
+    console.error(`Creating new user error ${name} ${message}`);
+
+    return `/unauthorized?error=${encodeURIComponent(
+      "Error creating new linked social user"
+    )}`;
+  }
+};
+
+// Auto-generate a username for social accounts
+export const createUsername = (user: User | AdapterUser): string => {
+  if (user?.name) {
+    return slugify(user.name, {
+      lower: true,
+      trim: true,
+      replacement: ".",
+    });
+  }
+
+  if (user?.email) {
+    return slugify(user.email.split("@")[0], {
+      lower: true,
+      trim: true,
+      replacement: ".",
+    });
+  }
+
+  return createGibberishUsername();
+};
+
+// Creates unique usernames for social logins e.g "appearance.spiky.440" (fallback method to ensure uniqueness)
+export const createGibberishUsername = () =>
+  `${generateUsername(".")}.${new Date().getTime().toString().slice(-3)}`;

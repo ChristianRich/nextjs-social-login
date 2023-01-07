@@ -14,7 +14,7 @@ export const isValidEmail = (email: string | undefined): boolean => {
 /**
  * Collapse multiple spaces and trim with the optional lowercasing
  */
-export const collapseSpaces = (str: string, toLowerCase = false): string => {
+export const collapseSpaces = (str = "", toLowerCase = false): string => {
   const result = str.replace(/\s\s+/g, " ").trim();
   return toLowerCase ? result.toLowerCase() : result;
 };
