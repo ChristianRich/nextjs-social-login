@@ -30,15 +30,16 @@ export default NextAuth({
 
         const { email, password } = credentials;
         const userProfileData: any | null = await getUserByEmail(email);
+
+        if (!userProfileData) {
+          console.error("Back-end user not found");
+          return null;
+        }
+
         const tokens: any | null = await signInUser(email, password);
 
         if (!tokens) {
           console.error("No tokens returned from sign-in");
-          return null;
-        }
-
-        if (!userProfileData) {
-          console.error("Back-end user not found");
           return null;
         }
 
