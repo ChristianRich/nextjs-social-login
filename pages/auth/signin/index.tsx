@@ -17,7 +17,7 @@ const Signin = ({ csrfToken }) => {
       <div className={styles.wrapper} />
       <div className={styles.content}>
         <div className={styles.cardWrapper}>
-          <h1 className={inter.className}>Login or register</h1>
+          <h1 className={inter.className}>Sign-in or register</h1>
           <div className={styles.cardContent}>
             <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
             <Credentials />
@@ -30,10 +30,10 @@ const Signin = ({ csrfToken }) => {
               style={{ fontSize: "16px", marginBottom: "20px" }}
               onClick={() => signIn("google")}
             />
-            <AppleLoginButton
+            {/* <AppleLoginButton
               style={{ fontSize: "16px", marginBottom: "20px" }}
               onClick={() => signIn("apple")}
-            />
+            /> */}
           </div>
         </div>
       </div>
