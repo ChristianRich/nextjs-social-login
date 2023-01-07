@@ -48,9 +48,9 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
       fetch(`${process.env.NEXT_PUBLIC_USER_API_URL}/user`, {
         method: "POST",
         signal,
-        mode: "cors",
+        // mode: "cors",
         headers: {
-          Accept: "application/json, text/plain, */*",
+          // Accept: "application/json, text/plain, */*",
           "Content-Type": "application/json",
           "x-api-key": String(process.env.NEXT_PUBLIC_USER_API_KEY),
         },
@@ -66,7 +66,7 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
           if (!response.ok) {
             return response.json();
           } else {
-            console.log("User created");
+            console.log("User successfully created");
 
             const res: SignInResponse | undefined = await signIn(
               "credentials",
@@ -78,7 +78,7 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
             );
 
             if (!res || !res.ok || res.error) {
-              setError("Sign-in after sign-up failed");
+              setError(`Post registration sign-in error: ${res?.error}`);
               return;
             }
 

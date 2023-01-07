@@ -32,8 +32,11 @@ export const signInOrRegisterSocialUser = async (params: {
       return true;
     }
   } catch (e) {
+    const { message } = <HttpError>e;
+    console.log("CATCH getUserByEmail");
+    console.log(e);
     return `/unauthorized?error=${encodeURIComponent(
-      "An error occurred while setting up your account"
+      `Account creation error: ${message}`
     )}`;
   }
 
