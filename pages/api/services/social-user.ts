@@ -8,6 +8,7 @@ import { generateUsername } from "username-generator";
 import { HttpError } from "http-errors";
 import { AdapterUser } from "next-auth/adapters";
 import { Account, User } from "next-auth";
+import { getEnvVars } from "../../../utils/env";
 
 export const signInOrRegisterSocialUser = async (params: {
   user: User | AdapterUser;
@@ -15,6 +16,9 @@ export const signInOrRegisterSocialUser = async (params: {
 }): Promise<boolean | string> => {
   const { account, user } = params;
   const { email } = user;
+
+  console.log(signInOrRegisterSocialUser);
+  console.log(getEnvVars());
 
   if (!email) {
     return `/unauthorized?error=${encodeURIComponent(

@@ -5,6 +5,7 @@ import Header from "../components/header";
 import absoluteUrl from "next-absolute-url";
 import { AppContext } from "next/app";
 import { ReactElement } from "react";
+import { getEnvVars } from "../utils/env";
 
 interface CustomAppProps {
   Component: AppProps["Component"];
@@ -52,6 +53,13 @@ App.getInitialProps = async (
   const {
     ctx: { req },
   } = appContext;
+
+  console.log("console.log");
+  console.info("console.info");
+  console.error("console.error");
+  console.debug("console.debug");
+
+  console.debug(getEnvVars());
 
   return {
     locals: {

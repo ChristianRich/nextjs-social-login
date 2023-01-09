@@ -30,23 +30,29 @@ const CaptureEmailForm = (props: Props): React.ReactElement<Props> => {
         return;
       }
 
+      if (!process.env.NEXT_PUBLIC_USER_API_URL) {
+        throw new Error("NEXT_PUBLIC_USER_API_URL required");
+      }
+
+      if (!process.env.NEXT_PUBLIC_USER_API_KEY) {
+        throw new Error("NEXT_PUBLIC_USER_API_KEY required");
+      }
+
       setIsLoading(true);
 
       const controller: AbortController = new AbortController();
       const { signal, abort } = controller;
-      const headers: Headers = new Headers();
-      headers.append("x-api-key", String(process.env.NEXT_PUBLIC_USER_API_KEY));
-
-      const requestOptions: RequestInit = {
-        signal,
-        headers,
-      };
 
       fetch(
         `${
           process.env.NEXT_PUBLIC_USER_API_URL
         }/user/exists/email/${encodeURIComponent(email)}`,
-        requestOptions
+        {
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_USER_API_KEY,
+          },
+          signal,
+        }
       )
         .then((response) => {
           if (!response.ok) {

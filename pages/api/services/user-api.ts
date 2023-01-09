@@ -9,7 +9,8 @@ export const getUserByEmail = async (
   try {
     const config: AxiosRequestConfig = {
       method: "GET",
-      url: `${getConfig(Config.NEXT_PUBLIC_USER_API_URL)}/user/email/${email}`,
+      // url: `${getConfig(Config.NEXT_PUBLIC_USER_API_URL)}/user/email/${email}`,
+      url: `process.env.NEXT_PUBLIC_USER_API_URL}/user/email/${email}`,
       headers: {
         "x-api-key": getConfig(Config.NEXT_PUBLIC_USER_API_KEY),
       },
