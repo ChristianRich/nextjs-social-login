@@ -20,6 +20,7 @@ export default NextAuth({
         email: { type: "text", placeholder: "Email" },
         password: { label: "Password", type: "password" },
       },
+      // https://next-auth.js.org/providers/credentials#example---username--password
       async authorize(
         credentials: Record<"email" | "password", string> | undefined
       ): Promise<User | null> {

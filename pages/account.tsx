@@ -3,10 +3,11 @@ import Image, { ImageLoaderProps } from "next/image";
 import styles from "../styles/Signin.module.css";
 import { Inter } from "@next/font/google";
 import { Session } from "next-auth";
-import { GetServerSidePropsContext } from "next";
+import { GetServerSidePropsContext, GetStaticPropsContext } from "next";
 import { DefaultPageProps } from "./_app";
 import absoluteUrl from "next-absolute-url";
-import type { Location } from "./_app";
+import Spinner from "react-svg-spinner";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export interface Props extends DefaultPageProps {
@@ -15,7 +16,23 @@ export interface Props extends DefaultPageProps {
 
 const Account = (props: Props) => {
   const { userProfileData } = props;
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <div
+        style={{
+          float: "left",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          padding: "10px",
+        }}
+      >
+        <Spinner thickness={2} size="40px" speed="fast" color={"#fff"} />
+      </div>
+    );
+  }
 
   console.log(userProfileData);
 
@@ -59,13 +76,27 @@ const Account = (props: Props) => {
 
 export default Account;
 
+// Run client side before render. CAN NO BE USED IN CONJUNCTION WITH `getServerSideProps`
+// TODO Test this out
+// export async function getStaticProps(context: GetStaticPropsContext) {
+//   console.log("getStaticProps");
+//   const products = [{ pid: 1 }, { pid: 2 }];
+
+//   return {
+//     props: {
+//       products,
+//     },
+//   };
+// }
+
 // Server-side protected route with redirect to login page
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session: Session | null = await getSession(context);
 
   if (!session) {
-    const location: Location = absoluteUrl(context.req);
-    const redirectURL = encodeURIComponent(`${location.origin}/account`);
+    const redirectURL = encodeURIComponent(
+      `${absoluteUrl(context.req).origin}/account`
+    );
 
     return {
       redirect: {

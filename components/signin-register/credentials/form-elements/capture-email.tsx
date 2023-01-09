@@ -118,7 +118,9 @@ const CaptureEmailForm = (props: Props): React.ReactElement<Props> => {
       />
       <button
         disabled={isLoading}
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault();
+
           if (!isValidEmail(email)) {
             setError("Please enter a valid email");
             return;

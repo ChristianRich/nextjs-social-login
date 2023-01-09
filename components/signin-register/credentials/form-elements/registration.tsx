@@ -48,9 +48,7 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
       fetch(`${process.env.NEXT_PUBLIC_USER_API_URL}/user`, {
         method: "POST",
         signal,
-        // mode: "cors",
         headers: {
-          // Accept: "application/json, text/plain, */*",
           "Content-Type": "application/json",
           "x-api-key": String(process.env.NEXT_PUBLIC_USER_API_KEY),
         },
@@ -252,7 +250,8 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
       />
       <button
         disabled={isLoading}
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault();
           // TODO Validate form
           setDoSubmit(true);
         }}
