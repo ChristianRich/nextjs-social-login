@@ -1,14 +1,9 @@
-import {
-  createSocialUser,
-  getUserByEmail,
-  verifyUsername,
-} from "../services/user-api";
+import { createSocialUser, getUserByEmail, verifyUsername } from "./user-api";
 import slugify from "slugify";
 import { generateUsername } from "username-generator";
 import { HttpError } from "http-errors";
 import { AdapterUser } from "next-auth/adapters";
 import { Account, User } from "next-auth";
-import { getEnvVars } from "../../../utils/env";
 
 export const signInOrRegisterSocialUser = async (params: {
   user: User | AdapterUser;
@@ -16,9 +11,6 @@ export const signInOrRegisterSocialUser = async (params: {
 }): Promise<boolean | string> => {
   const { account, user } = params;
   const { email } = user;
-
-  console.log(signInOrRegisterSocialUser);
-  console.log(getEnvVars());
 
   if (!email) {
     return `/unauthorized?error=${encodeURIComponent(
@@ -51,7 +43,7 @@ export const signInOrRegisterSocialUser = async (params: {
   try {
     await verifyUsername(username);
   } catch (error) {
-    username = createGibberishUsername();
+    username = generateUniqueUsernam();
   }
 
   try {
@@ -90,9 +82,9 @@ export const createUsername = (user: User | AdapterUser): string => {
     });
   }
 
-  return createGibberishUsername();
+  return generateUniqueUsernam();
 };
 
 // Creates unique usernames for social logins e.g "appearance.spiky.440" (fallback method to ensure uniqueness)
-export const createGibberishUsername = () =>
+export const generateUniqueUsernam = () =>
   `${generateUsername(".")}.${new Date().getTime().toString().slice(-3)}`;

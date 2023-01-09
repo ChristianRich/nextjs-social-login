@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { Config, SOURCE_SYSTEM } from "../../../constants";
-import { getConfig } from "../../../utils/env";
-import { axiosToHttpError } from "../../../utils/error/parse";
+import { Config, SOURCE_SYSTEM } from "../constants";
+import { getConfig } from "../utils/env";
+import { axiosToHttpError } from "../utils/error/parse";
 
 export const getUserByEmail = async (
   email: string
