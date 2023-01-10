@@ -29,8 +29,6 @@ export const signInOrRegisterSocialUser = async (params: {
     }
   } catch (e) {
     const { message } = <HttpError>e;
-    console.log("CATCH getUserByEmail");
-    console.log(e);
     return `/unauthorized?error=${encodeURIComponent(
       `Account creation error: ${message}`
     )}`;
@@ -57,7 +55,8 @@ export const signInOrRegisterSocialUser = async (params: {
 
     return true;
   } catch (e) {
-    const { message, name } = <HttpError>e;
+    const { name, message } = <HttpError>e;
+    console.error(`Error creating social user ${name} ${message}`);
     return `/unauthorized?error=${encodeURIComponent(
       "Error creating new linked social user"
     )}`;

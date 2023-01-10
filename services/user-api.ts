@@ -11,8 +11,7 @@ export const getUserByEmail = async (
   try {
     const { data } = await axios({
       method: "GET",
-      // url: `${getConfig(Config.USER_API_URL)}/user/email/${email}`,
-      url: `${process.env.USER_API_URL}/user/email/${email}`,
+      url: `${getConfig(Config.USER_API_URL)}/user/email/${email}`,
       headers: {
         "x-api-key": getConfig(Config.USER_API_KEY),
       },

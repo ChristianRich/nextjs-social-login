@@ -16,7 +16,7 @@ import { getEnvVars } from "../utils/env";
 const inter = Inter({ subsets: ["latin"] });
 
 export interface Props extends DefaultPageProps {
-  envVars: any;
+  envVars?: any; // For debugging
 }
 
 export default function Home(props: Props) {
@@ -24,10 +24,8 @@ export default function Home(props: Props) {
     locals: {
       location: { origin },
     },
-    envVars,
   } = props;
 
-  console.log(envVars);
   const { data: session } = useSession();
 
   return (
@@ -39,7 +37,7 @@ export default function Home(props: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div style={{ position: "absolute", left: 0, top: 0, padding: "10px" }}>
-        <span className={inter.className}>v1.0.5</span>
+        <span className={inter.className}>v1.0.6</span>
       </div>
       <main className={styles.main}>
         <div className={styles.description}>
@@ -168,7 +166,7 @@ export const getServerSideProps: GetServerSideProps<any> = async ({
 }: GetServerSidePropsContext): Promise<GetServerSidePropsResult<any>> => {
   return {
     props: {
-      envVars: getEnvVars(),
+      // envVars: getEnvVars(),
       featuredProducts: [{ id: "1" }, { id: 2 }],
     },
   };
