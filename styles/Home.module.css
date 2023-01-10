@@ -13,12 +13,19 @@
   align-items: inherit;
   font-size: 0.85rem;
   max-width: var(--max-width);
-  width: 100%;
+  width: auto;
   z-index: 2;
   font-family: var(--font-mono);
 }
 
 .description a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.description div {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -97,7 +104,7 @@
 
 .center::before,
 .center::after {
-  content: '';
+  content: "";
   left: 50%;
   position: absolute;
   filter: blur(45px);
@@ -125,7 +132,7 @@
 
 .thirteen::before,
 .thirteen::after {
-  content: '';
+  content: "";
   position: absolute;
   z-index: -1;
 }
@@ -257,16 +264,16 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .vercelLogo {
-    filter: invert(1);
-  }
-
-  .logo,
-  .thirteen img {
-    filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
-  }
+/* @media (prefers-color-scheme: dark) { */
+.vercelLogo {
+  filter: invert(1);
 }
+
+.logo,
+.thirteen img {
+  filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
+}
+/* } */
 
 @keyframes rotate {
   from {
