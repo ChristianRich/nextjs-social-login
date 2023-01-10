@@ -3,7 +3,7 @@ import Image, { ImageLoaderProps } from "next/image";
 import styles from "../styles/Signin.module.css";
 import { Inter } from "@next/font/google";
 import { Session } from "next-auth";
-import { GetServerSidePropsContext, GetStaticPropsContext } from "next";
+import { GetServerSidePropsContext } from "next";
 import { DefaultPageProps } from "./_app";
 import absoluteUrl from "next-absolute-url";
 import Spinner from "react-svg-spinner";
@@ -77,7 +77,7 @@ const Account = (props: Props) => {
 export default Account;
 
 // Run client side before render. CAN NO BE USED IN CONJUNCTION WITH `getServerSideProps`
-// TODO Test this out
+// TODO Test this out. This block will cause the server-side props NOT to be refreshed
 // export async function getStaticProps(context: GetStaticPropsContext) {
 //   console.log("getStaticProps");
 //   const products = [{ pid: 1 }, { pid: 2 }];

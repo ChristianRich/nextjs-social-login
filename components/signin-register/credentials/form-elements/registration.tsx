@@ -23,9 +23,7 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
   const [lastValidatedUsername, setLastValidatedUsername] =
     useState<string>("");
   const [username, setUsername] = useState<string>("");
-  const [verifiedUsername, setVerifiedUsername] = useState<boolean | undefined>(
-    undefined
-  );
+  const [verifiedUsername, setVerifiedUsername] = useState<boolean>();
 
   const [password, setPassword] = useState<string>();
   const [repeatPassword, setRepeatPassword] = useState<string>();
@@ -45,12 +43,11 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
       const controller: AbortController = new AbortController();
       const { signal, abort } = controller;
 
-      fetch(`${process.env.NEXT_PUBLIC_USER_API_URL}/user`, {
+      fetch(`/api/user-api/user`, {
         method: "POST",
         signal,
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": String(process.env.NEXT_PUBLIC_USER_API_KEY),
         },
         body: JSON.stringify({
           name: username,
@@ -135,18 +132,10 @@ const RegistrationForm = (props: Props): React.ReactElement<Props> => {
       const controller: AbortController = new AbortController();
       const { signal, abort } = controller;
 
-      fetch(
-        `${process.env.NEXT_PUBLIC_USER_API_URL}/username/${encodeURIComponent(
-          username
-        )}/verify`,
-        {
-          method: "GET",
-          signal,
-          headers: {
-            "x-api-key": String(process.env.NEXT_PUBLIC_USER_API_KEY),
-          },
-        }
-      )
+      fetch(`/api/user-api/username/${encodeURIComponent(username)}/verify`, {
+        method: "GET",
+        signal,
+      })
         .then((response) => {
           setIsLoading(false);
           setVerifiedUsername(response.ok);

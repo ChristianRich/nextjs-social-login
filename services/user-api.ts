@@ -1,52 +1,40 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios from "axios";
+import { HttpError } from "http-errors";
 import { Config, SOURCE_SYSTEM } from "../constants";
+import { UserAccountProfile } from "../types/user";
 import { getConfig } from "../utils/env";
-import { axiosToHttpError } from "../utils/error/parse";
+import { toHttpError } from "../utils/error/parse";
 
 export const getUserByEmail = async (
   email: string
-): Promise<unknown | null> => {
+): Promise<UserAccountProfile | null> => {
   try {
-    const config: AxiosRequestConfig = {
+    const { data } = await axios({
       method: "GET",
-      // url: `${getConfig(Config.NEXT_PUBLIC_USER_API_URL)}/user/email/${email}`,
-      url: `process.env.NEXT_PUBLIC_USER_API_URL}/user/email/${email}`,
+      url: `${getConfig(Config.USER_API_URL)}/user/email/${email}`,
       headers: {
-        "x-api-key": getConfig(Config.NEXT_PUBLIC_USER_API_KEY),
+        "x-api-key": getConfig(Config.USER_API_KEY),
       },
-    };
-
-    console.log("getUserByEmail()", config);
-    const { data } = await axios(config);
+    });
     return data;
   } catch (e) {
-    const { response } = <AxiosError>e;
-
-    if (response?.status === 404) {
-      return null;
-    }
-
-    throw axiosToHttpError(e, "getUserByEmail");
+    throw <HttpError>toHttpError(e);
   }
 };
 
-// Returns 200 when usename is valid and available. Otherwise returns 400 with an error message
 export const verifyUsername = async (username: string): Promise<void> => {
   try {
-    const config: AxiosRequestConfig = {
+    await axios({
       method: "GET",
-      url: `${getConfig(
-        Config.NEXT_PUBLIC_USER_API_URL
-      )}/username/${encodeURIComponent(username)}/verify`,
+      url: `${getConfig(Config.USER_API_URL)}/username/${encodeURIComponent(
+        username.trim()
+      )}/verify`,
       headers: {
-        "x-api-key": getConfig(Config.NEXT_PUBLIC_USER_API_KEY),
+        "x-api-key": getConfig(Config.USER_API_KEY),
       },
-    };
-
-    console.log("verifyUsername()", config);
-    await axios(config);
+    });
   } catch (e) {
-    throw axiosToHttpError(e, "verifyUsername");
+    throw <HttpError>toHttpError(e);
   }
 };
 
@@ -56,13 +44,14 @@ export const createSocialUser = async (
   providerAccountId: string,
   name: string,
   email: string
-): Promise<unknown> => {
+): Promise<UserAccountProfile> => {
   try {
-    const config: AxiosRequestConfig = {
+    console.log("createSocialUser()", { name, email, provider });
+    const { data } = await axios({
       method: "POST",
-      url: `${getConfig(Config.NEXT_PUBLIC_USER_API_URL)}/user/social`,
+      url: `${getConfig(Config.USER_API_URL)}/user/social`,
       headers: {
-        "x-api-key": getConfig(Config.NEXT_PUBLIC_USER_API_KEY),
+        "x-api-key": getConfig(Config.USER_API_KEY),
       },
       data: {
         provider,
@@ -72,40 +61,63 @@ export const createSocialUser = async (
         email,
         sourceSystem: SOURCE_SYSTEM,
       },
-    };
-
-    console.log("createSocialUser()", config);
-    const { data } = await axios(config);
+    });
     return data;
   } catch (e) {
-    const { name, message } = <AxiosError>e;
-    console.error(`Error createSocialUser() ${name} ${message}`);
-    throw axiosToHttpError(e, "createSocialUser");
+    throw <HttpError>toHttpError(e);
   }
 };
 
-export const signInUser = async (
+export const createCredentialsUser = async ({
+  name,
+  email,
+  password,
+  repeatPassword,
+  sourceSystem = SOURCE_SYSTEM,
+}): Promise<UserAccountProfile> => {
+  try {
+    console.log("createCredentialsUser()", { name, email });
+    const { data } = await axios({
+      method: "POST",
+      url: `${getConfig(Config.USER_API_URL)}/user`,
+      headers: {
+        "x-api-key": getConfig(Config.USER_API_KEY),
+      },
+      data: {
+        name,
+        email,
+        password,
+        repeatPassword,
+        sourceSystem,
+      },
+    });
+    return data;
+  } catch (e) {
+    throw <HttpError>toHttpError(e);
+  }
+};
+
+// TODO Types for tokens. And how are tokens handled?
+export const authenticateWithCredentials = async (
   email: string,
   password: string
 ): Promise<unknown> => {
   try {
-    const config: AxiosRequestConfig = {
+    console.log("authenticateWithCredentials()", { email });
+    const { data } = await axios({
       method: "POST",
-      url: `${getConfig(Config.NEXT_PUBLIC_USER_API_URL)}/auth/login`,
+      url: `${getConfig(Config.USER_API_URL)}/auth/login`,
       headers: {
-        "X-Api-Key": getConfig(Config.NEXT_PUBLIC_USER_API_KEY),
+        "x-api-key": getConfig(Config.USER_API_KEY),
         "Content-Type": "application/json",
       },
       data: JSON.stringify({
         email,
         password,
       }),
-    };
-
-    console.log("SignIn()", config);
-    const { data } = await axios(config);
+    });
     return data;
   } catch (e) {
-    throw axiosToHttpError(e, "signInUser");
+    throw <HttpError>toHttpError(e);
   }
 };

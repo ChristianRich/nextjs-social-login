@@ -12,8 +12,8 @@ export class Config {
   static readonly NEXTAUTH_SECRET = "NEXTAUTH_SECRET";
   static readonly NEXTAUTH_DEBUG = "NEXTAUTH_DEBUG"; // Not official to NextAuth
 
-  static readonly NEXT_PUBLIC_USER_API_URL = "NEXT_PUBLIC_USER_API_URL";
-  static readonly NEXT_PUBLIC_USER_API_KEY = "NEXT_PUBLIC_USER_API_KEY";
+  static readonly USER_API_URL = "USER_API_URL";
+  static readonly USER_API_KEY = "USER_API_KEY";
 }
 
 // https://nextjs.org/docs/basic-features/environment-variables#environment-variable-load-order

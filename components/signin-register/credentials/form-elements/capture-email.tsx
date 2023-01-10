@@ -30,30 +30,14 @@ const CaptureEmailForm = (props: Props): React.ReactElement<Props> => {
         return;
       }
 
-      if (!process.env.NEXT_PUBLIC_USER_API_URL) {
-        throw new Error("NEXT_PUBLIC_USER_API_URL required");
-      }
-
-      if (!process.env.NEXT_PUBLIC_USER_API_KEY) {
-        throw new Error("NEXT_PUBLIC_USER_API_KEY required");
-      }
-
       setIsLoading(true);
 
       const controller: AbortController = new AbortController();
       const { signal, abort } = controller;
 
-      fetch(
-        `${
-          process.env.NEXT_PUBLIC_USER_API_URL
-        }/user/exists/email/${encodeURIComponent(email)}`,
-        {
-          headers: {
-            "x-api-key": process.env.NEXT_PUBLIC_USER_API_KEY,
-          },
-          signal,
-        }
-      )
+      fetch(`/api/user/exists/email/${encodeURIComponent(email)}`, {
+        signal,
+      })
         .then((response) => {
           if (!response.ok) {
             setError("Username check error");

@@ -54,16 +54,11 @@ App.getInitialProps = async (
     ctx: { req },
   } = appContext;
 
-  // console.log("console.log");
-  // console.info("console.info");
-  // console.error("console.error");
-  // console.debug("console.debug");
-
   // console.debug(getEnvVars());
 
   return {
     locals: {
-      location: absoluteUrl(req),
+      location: absoluteUrl(req), // TODO Reconsider this approach?
     },
   };
 };

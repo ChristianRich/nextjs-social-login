@@ -4,7 +4,7 @@ import styles from "../../../styles/Signin.module.css";
 import SignInRegister from "../../../components/signin-register";
 
 // https://cloudcoders.xyz/blog/nextauth-credentials-provider-with-external-api-and-login-page/
-const Signin = ({ csrfToken }) => {
+const SigninPage = ({ csrfToken }) => {
   return (
     <>
       <SignInRegister csrfToken={csrfToken} />
@@ -17,7 +17,7 @@ const Signin = ({ csrfToken }) => {
   );
 };
 
-export default Signin;
+export default SigninPage;
 
 export async function getServerSideProps(context) {
   return {

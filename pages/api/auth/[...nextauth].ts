@@ -6,7 +6,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getConfig } from "../../../utils/env";
 import { Config } from "../../../constants";
 import { AdapterUser } from "next-auth/adapters";
-import { getUserByEmail, signInUser } from "../../../services/user-api";
+import {
+  getUserByEmail,
+  authenticateWithCredentials,
+} from "../../../services/user-api";
 import { signInOrRegisterSocialUser } from "../../../services/social-user";
 
 // https://next-auth.js.org/configuration/options
@@ -37,7 +40,10 @@ export default NextAuth({
           return null;
         }
 
-        const tokens: any | null = await signInUser(email, password);
+        const tokens: any | null = await authenticateWithCredentials(
+          email,
+          password
+        );
 
         if (!tokens) {
           console.error("No tokens returned from sign-in");

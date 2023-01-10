@@ -1,58 +1,61 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { type AxiosError } from "axios";
 import createError from "http-errors";
-import type { HttpError } from "http-errors";
+import { HttpError } from "http-errors";
+import { NODE_ENV } from "../../constants";
 
-export const axiosToHttpError = (
-  e: Error | AxiosError | unknown,
-  requestName: string // e.g 'getUser'
+/**
+ * Transform a variety of Error constructs to a well-formatted HttpError
+ * @param { Error | AxiosError | HttpError | string | unknown} error
+ * @param { boolean=} expose
+ * @returns { HttpError }
+ */
+export const toHttpError = (
+  error: Error | AxiosError | HttpError | string | unknown,
+  expose: boolean = process.env.NODE_ENV !== NODE_ENV.PRD
 ): HttpError => {
-  if (axios.isAxiosError(e)) {
-    const axiosError: AxiosError = e;
-    const { message, code } = axiosError;
-    const response: AxiosResponse | undefined = axiosError?.response;
+  // Pass through
+  if (error instanceof HttpError) {
+    return error;
+  }
+
+  const e: HttpError = createError();
+
+  if (axios.isAxiosError(error)) {
+    const { name, message, stack, response } = error;
+
+    e.name = name;
+    e.message = message;
+
+    if (expose) {
+      e.stack = stack;
+    }
 
     if (response) {
       const { status, statusText, data = {} } = response;
-
-      console.error(
-        `Axios request ${requestName} failed ${combine(
-          statusText || message || code,
-          data?.message
-        )}`
-      );
-
-      return createError(status, combine(statusText, data?.message));
-    } else {
-      console.error(
-        `Axios request ${requestName} failed: ${combine(code, message)}`
-      );
-      return createError(500, combine(code, message));
+      e.status = e.statusCode = status;
+      e.message = data?.message ? data.message : `${statusText}: ${message}`;
+      return e;
     }
   }
 
-  if (e instanceof Error) {
-    return createError(500, e.message);
+  if (error instanceof Error) {
+    const { name, message, stack } = error;
+
+    e.name = name;
+    e.message = message;
+    e.status = e.statusCode = 500;
+
+    if (expose) {
+      e.stack = stack;
+    }
+
+    return e;
   }
 
-  return createError(500, "Internal Server Error");
-};
+  // Fallback
+  e.status = e.statusCode = 500;
+  e.name = "Error";
+  e.message = typeof error === "string" ? error : "Internal Server Error";
 
-export const combine = (
-  a?: string,
-  b?: string,
-  delimiter: string = ": "
-): string => {
-  if (a && b) {
-    return `${a}${delimiter}${b}`;
-  }
-
-  if (a) {
-    return a;
-  }
-
-  if (b) {
-    return b;
-  }
-
-  return "";
+  return e;
 };
