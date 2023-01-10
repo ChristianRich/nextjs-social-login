@@ -1,14 +1,27 @@
 import axios from "axios";
 import { HttpError } from "http-errors";
+import NodeCache from "node-cache";
 import { Config, SOURCE_SYSTEM } from "../constants";
 import { UserAccountProfile } from "../types/user";
 import { getConfig } from "../utils/env";
 import { toHttpError } from "../utils/error/parse";
 
+const memCache: NodeCache = new NodeCache({
+  stdTTL: 60, // seconds
+  checkperiod: 60,
+  deleteOnExpire: true,
+});
+
 export const getUserByEmail = async (
-  email: string
+  email: string,
+  cache: boolean = true
 ): Promise<UserAccountProfile | null> => {
+  if (cache && memCache.has(email)) {
+    return <UserAccountProfile>memCache.get(email);
+  }
+
   try {
+    console.debug(`Get user by email ${email}`);
     const { data } = await axios({
       method: "GET",
       url: `${getConfig(Config.USER_API_URL)}/user/email/${email}`,
@@ -16,6 +29,7 @@ export const getUserByEmail = async (
         "x-api-key": getConfig(Config.USER_API_KEY),
       },
     });
+    memCache.set(email, data);
     return data;
   } catch (e) {
     throw <HttpError>toHttpError(e);

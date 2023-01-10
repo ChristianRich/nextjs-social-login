@@ -43,6 +43,7 @@ const LoginWithCredentialsForm = (props: Props): React.ReactElement<Props> => {
       <input
         autoFocus
         name="password"
+        type="password"
         onChange={(e) => setPassword(e.target.value.trim())}
         style={{ height: "50px" }}
         placeholder="Password"
@@ -58,12 +59,22 @@ const LoginWithCredentialsForm = (props: Props): React.ReactElement<Props> => {
 
           setIsLoading(true);
 
-          // https://stackoverflow.com/questions/70165993/how-to-handle-login-failed-error-in-nextauth-js
-          const res: SignInResponse | undefined = await signIn("credentials", {
-            redirect: false,
-            email: existingUserEmail,
-            password,
-          });
+          let res: SignInResponse | undefined;
+
+          try {
+            // https://stackoverflow.com/questions/70165993/how-to-handle-login-failed-error-in-nextauth-js
+            res = await signIn("credentials", {
+              redirect: false,
+              email: existingUserEmail,
+              password,
+            });
+          } catch (e) {
+            setError(
+              "Unable to sign-in. Our Apologies, but it seems we're having some technical difficulties on our end"
+            );
+            setIsLoading(false);
+            return;
+          }
 
           setIsLoading(false);
 

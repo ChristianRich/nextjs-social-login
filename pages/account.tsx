@@ -1,5 +1,4 @@
 import { getSession, useSession } from "next-auth/react";
-import Image, { ImageLoaderProps } from "next/image";
 import styles from "../styles/Signin.module.css";
 import { Inter } from "@next/font/google";
 import { Session } from "next-auth";
@@ -7,33 +6,36 @@ import { GetServerSidePropsContext } from "next";
 import { DefaultPageProps } from "./_app";
 import absoluteUrl from "next-absolute-url";
 import Spinner from "react-svg-spinner";
+import { getUserByEmail } from "../services/user-api";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export interface Props extends DefaultPageProps {
-  userProfileData: any[];
+  userProfileData: any;
+  session: any;
 }
 
 const Account = (props: Props) => {
-  const { userProfileData } = props;
-  const { data: session, status } = useSession();
+  const { userProfileData, session } = props;
+  // const { data: session, status } = useSession();
 
-  if (status === "loading") {
-    return (
-      <div
-        style={{
-          float: "left",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          padding: "10px",
-        }}
-      >
-        <Spinner thickness={2} size="40px" speed="fast" color={"#fff"} />
-      </div>
-    );
-  }
+  // if (status === "loading") {
+  //   return (
+  //     <div
+  //       style={{
+  //         float: "left",
+  //         position: "absolute",
+  //         top: 0,
+  //         left: 0,
+  //         padding: "10px",
+  //       }}
+  //     >
+  //       <Spinner thickness={2} size="40px" speed="fast" color={"#fff"} />
+  //     </div>
+  //   );
+  // }
 
+  console.log(session);
   console.log(userProfileData);
 
   return (
@@ -43,22 +45,9 @@ const Account = (props: Props) => {
         <div className={styles.wrapper} />
         <div className={styles.content}>
           <div className={styles.cardWrapper}>
-            {session?.user?.image && (
-              <Image
-                loader={({ src }: ImageLoaderProps) => src}
-                src={session.user.image}
-                width={196}
-                height={64}
-                alt="App Logo"
-                style={{ height: "85px", marginBottom: "20px" }}
-              />
-            )}
             <div className={styles.cardContent}>
-              <h2 className={inter.className} style={{ color: "black" }}>
-                Account page <span>-&gt;</span>
-              </h2>
               <p className={inter.className} style={{ color: "black" }}>
-                {session?.user?.email && session.user.email}
+                Logged in as {session?.user?.email && session.user.email}
               </p>
             </div>
           </div>
@@ -75,19 +64,6 @@ const Account = (props: Props) => {
 };
 
 export default Account;
-
-// Run client side before render. CAN NO BE USED IN CONJUNCTION WITH `getServerSideProps`
-// TODO Test this out. This block will cause the server-side props NOT to be refreshed
-// export async function getStaticProps(context: GetStaticPropsContext) {
-//   console.log("getStaticProps");
-//   const products = [{ pid: 1 }, { pid: 2 }];
-
-//   return {
-//     props: {
-//       products,
-//     },
-//   };
-// }
 
 // Server-side protected route with redirect to login page
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -106,10 +82,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  // TODO Retrieve user profile
+  let userProfileData: any;
+
+  if (session.user?.email) {
+    userProfileData = await getUserByEmail(session.user.email);
+  }
+
   return {
     props: {
-      userProfileData: [{ name: "foo" }, { city: "Barcelona" }],
+      userProfileData,
+      session,
     },
   };
 }
