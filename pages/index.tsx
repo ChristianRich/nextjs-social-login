@@ -11,18 +11,23 @@ import {
   GetServerSidePropsResult,
 } from "next";
 import { DefaultPageProps } from "./_app";
+import { getEnvVars } from "../utils/env";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export interface Props extends DefaultPageProps {}
+export interface Props extends DefaultPageProps {
+  envVars: any;
+}
 
 export default function Home(props: Props) {
   const {
     locals: {
       location: { origin },
     },
+    envVars,
   } = props;
 
+  console.log(envVars);
   const { data: session } = useSession();
 
   return (
@@ -163,6 +168,7 @@ export const getServerSideProps: GetServerSideProps<any> = async ({
 }: GetServerSidePropsContext): Promise<GetServerSidePropsResult<any>> => {
   return {
     props: {
+      envVars: getEnvVars(),
       featuredProducts: [{ id: "1" }, { id: 2 }],
     },
   };
