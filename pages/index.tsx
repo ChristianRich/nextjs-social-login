@@ -37,7 +37,7 @@ export default function Home(props: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div style={{ position: "absolute", left: 0, top: 0, padding: "10px" }}>
-        <span className={inter.className}>v.1.0.8</span>
+        <span className={inter.className}>v.1.0.9</span>
       </div>
       <main className={styles.main}>
         <div className={styles.description}>

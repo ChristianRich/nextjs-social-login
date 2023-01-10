@@ -27,11 +27,8 @@ export const signInOrRegisterSocialUser = async (params: {
     if (existingUser) {
       return true;
     }
-  } catch (e) {
-    const { message } = <HttpError>e;
-    return `/unauthorized?error=${encodeURIComponent(
-      `Account creation error: ${message}`
-    )}`;
+  } catch {
+    // Account not found. Let's create one
   }
 
   // Use their social account profile info to create a username
